@@ -1,13 +1,15 @@
 # TargetArm-Capstone
 
 ## Getting Started
-We followed [this tutorial] (https://automaticaddison.com/how-to-write-a-c-c-program-for-nvidia-jetson-nano/) in order to set up the Jetson Nano to be able to code using C.
+We followed this tutorial in order to set up the Jetson Nano to be able to code using C : https://automaticaddison.com/how-to-write-a-c-c-program-for-nvidia-jetson-nano/ 
 
 Here are the steps for easy access:
 
 Creating and moving files into a folder:
 
 ```mkdir folder_name ```
+
+
 ```cd folder_name```
 
 Creating a new C programming file:
@@ -18,5 +20,9 @@ Creating a new C programming file:
 To view, compile and run the file:
 
 ``` ls```
+
+
 ``` gcc file_name.c -o file_name ```
+
+
 ``` ./file_name ```
