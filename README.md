@@ -5,12 +5,17 @@ We followed this tutorial in order to set up the Jetson Nano to be able to code 
 
 Here are the steps for easy access:
 
+First open the NVIDIA Terminal
+
+
 Creating and moving files into a folder:
 
 ```mkdir folder_name ```
 
 
 ```cd folder_name```
+
+
 
 Creating a new C programming file:
 
