@@ -13,9 +13,10 @@ Creating and moving files into a folder:
 ```cd folder_name```
 
 Creating a new C programming file:
+
 ``` gedit file_name.c ```
 
-** Remember to always save the file! **
+**Remember to always save the file!**
 
 To view, compile and run the file:
 
