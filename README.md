@@ -16,7 +16,6 @@ Creating and moving files into a folder:
 ```cd folder_name```
 
 
-
 Creating a new C programming file:
 
 ``` gedit file_name.c ```
@@ -54,5 +53,7 @@ Looking more into ROS ecosystems and how to communicate with the RPLiDar, we det
   ```sudo apt-get install liblua5.2-dev```
 
   ```export LUA_LIBRARIES=/usr/lib/aarch64-linux-gnu/liblua5.2.so```
+  
   ```export LUA_INCLUDE_DIR=/usr/include/lua5.2```
-- 
+  
+- To connect to the RPLiDar from the Jetson Nano, I followed this tutorial: https://www.hackster.io/shahizat/getting-started-with-the-low-cost-rplidar-using-jetson-nano-93521d
