@@ -18,7 +18,7 @@ Run ```catkin_make```
 
 Run ```source devel/setup.bash```
 
-In a #NEW TERMINAL:
+In a `NEW TERMINAL`:
 
 Run ```roscore```
 
