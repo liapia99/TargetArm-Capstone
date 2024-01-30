@@ -25,3 +25,5 @@ Run ```roscore```
 Go back to the original terminal with the sourced environment and run ```roslauch rplidar_ros view_rplidar.launch```
 
 The Rviz window should load with the map of the RPLiDar's surroundings. 
+
+To end the session just hit `CTRL C` in both terminals. 
