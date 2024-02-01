@@ -22,7 +22,7 @@ In a NEW TERMINAL:
 
 Run ```roscore```
 
-Go back to the original terminal with the sourced environment and run ```roslauch rplidar_ros view_rplidar.launch```
+Go back to the original terminal with the sourced environment and run ```roslaunch rplidar_ros view_rplidar.launch```
 
 The Rviz window should load with the map of the RPLiDar's surroundings. 
 
