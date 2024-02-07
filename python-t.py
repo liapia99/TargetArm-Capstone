@@ -14,8 +14,17 @@ def get_data():
         print(f"Error: {e}")
         return []
 
-plot_interval = 7  # Plot every 7 iterations
-max_iterations = 1000000
+plot_interval = 1  # Plot every iteration
+max_iterations = 10000000
+
+# Notes from 2/7/24
+# print theta and r - r = √(x2 + y2) θ = tan-1 ( y / x )
+# try to restrict from 45 to 135 
+# play with lidar range at the new table
+# move set up 
+# set up radius to 5 ft 
+# 
+
 
 for i in range(max_iterations):
     if (i % plot_interval == 0):
