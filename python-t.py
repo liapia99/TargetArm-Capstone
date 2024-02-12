@@ -17,13 +17,12 @@ def get_data():
 plot_interval = 1  # Plot every iteration
 max_iterations = 10000000
 
-# Notes from 2/7/24
+angle_min = np.radians(0)
+angle_max = np.radians(90) # restricting from 0 to 90 degrees 
+
+max_depth = 5.0 # depth is 5 feet
+
 # print theta and r - r = √(x2 + y2) θ = tan-1 ( y / x )
-# try to restrict from 45 to 135 
-# play with lidar range at the new table
-# move set up 
-# set up radius to 5 ft 
-# 
 
 
 for i in range(max_iterations):
@@ -34,7 +33,8 @@ for i in range(max_iterations):
     print(i)
     current_data = get_data()
     for point in current_data:
-        if point[0] == 15:
+        # Filter points based on angle and depth range
+        if angle_min <= np.radians(point[1]) <= angle_max and point[2] <= max_depth:
             angles.append(np.radians(point[1]))  # Convert angle to radians
             distances.append(point[2])
             intensity.append(point[1])  # Use distance (or another appropriate value) as intensity
