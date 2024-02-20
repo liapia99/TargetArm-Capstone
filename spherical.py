@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import cm
 from rplidar import RPLidar, RPLidarException
 
 def get_data():
@@ -21,6 +22,15 @@ tilt_angles = np.arange(-30, 31, 1)  # Tilt angles from -30 to 30 degrees
 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
+sc = ax.scatter([], [], [], c=[], cmap='viridis', marker='o', alpha=0.5)
+ax.set_xlabel('Azimuthal Angle')
+ax.set_ylabel('Polar Angle')
+ax.set_zlabel('Radius')
+plt.title('RPLidar Data (Spherical Coordinates)')
+
+# Create and display color bar
+cbar = plt.colorbar(sc, label='Intensity')
+plt.show(block=False)
 
 for i in range(max_iterations):
     if (i % plot_interval == 0):
@@ -47,15 +57,10 @@ for i in range(max_iterations):
         intensity.append(point[1])  # Use distance (or another appropriate value) as intensity
 
     if i % plot_interval == 0 and azimuths and polar_angles and distances:
-        ax.cla()
+        sc.remove()  # Remove the previous scatter plot
         sc = ax.scatter(azimuths, polar_angles, distances, c=intensity, cmap='viridis', marker='o', alpha=0.5)
-        ax.set_xlabel('Azimuthal Angle')
-        ax.set_ylabel('Polar Angle')
-        ax.set_zlabel('Radius')
-        plt.title('RPLidar Data (Spherical Coordinates)')
-        plt.colorbar(sc, label='Intensity')
+        cbar.update_normal(sc)
         plt.pause(0.1)
 
-plt.show(block=False)
 plt.pause(10)  # Adjust as needed to keep the plot visible for some time
 plt.close()
