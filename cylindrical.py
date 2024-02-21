@@ -15,7 +15,7 @@ def get_data():
         print(f"Error: {e}")
         return []
 
-plot_interval = 7  # Plot every 7 iterations
+plot_interval = 1
 max_iterations = 1000000
 
 for i in range(max_iterations):
