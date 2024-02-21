@@ -18,6 +18,17 @@ def get_data():
 plot_interval = 1
 max_iterations = 1000000
 
+# Create initial 3D plot
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+sc = ax.scatter([], [], [], c=[], cmap='viridis', marker='o', alpha=0.5)
+ax.set_xlabel('X Coordinates')
+ax.set_ylabel('Y Coordinates')
+ax.set_zlabel('Z Coordinates (meters)')
+plt.title('RPLidar Data (3D Cartesian Plot)')
+plt.colorbar(sc, label='Intensity')
+plt.grid(True)
+
 for i in range(max_iterations):
     if (i % plot_interval == 0):
         x_coordinates = []  # Initialize as a Python list
@@ -34,16 +45,8 @@ for i in range(max_iterations):
             intensity.append(point[2])  # Use distance (or another appropriate value) as intensity
 
     if i % plot_interval == 0 and x_coordinates and y_coordinates and z_coordinates:
-        plt.clf()
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        sc.remove()  # Remove the previous scatter plot
         sc = ax.scatter(x_coordinates, y_coordinates, z_coordinates, c=intensity, cmap='viridis', marker='o', alpha=0.5)
-        ax.set_xlabel('X Coordinates')
-        ax.set_ylabel('Y Coordinates')
-        ax.set_zlabel('Z Coordinates (meters)')
-        plt.title('RPLidar Data (3D Cartesian Plot)')
-        plt.colorbar(sc, label='Intensity')
-        plt.grid(True)
         plt.pause(0.1)
 
 plt.show(block=False)
