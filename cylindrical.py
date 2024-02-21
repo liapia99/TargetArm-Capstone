@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D 
 from rplidar import RPLidar, RPLidarException
 
 def get_data():
@@ -14,13 +15,14 @@ def get_data():
         print(f"Error: {e}")
         return []
 
-plot_interval = 7  # Plot every 7 iterations
+plot_interval = 1 
 max_iterations = 1000000
 
 for i in range(max_iterations):
     if (i % plot_interval == 0):
         x_coordinates = []  # Initialize as a Python list
         y_coordinates = []  # Initialize as a Python list
+        z_coordinates = []  # Initialize as a Python list
         intensity = []  # Initialize as a Python list
     print(i)
     current_data = get_data()
@@ -28,15 +30,19 @@ for i in range(max_iterations):
         if point[0] == 15:
             x_coordinates.append(point[2] * np.cos(np.radians(point[1])))  # Convert polar to Cartesian x
             y_coordinates.append(point[2] * np.sin(np.radians(point[1])))  # Convert polar to Cartesian y
+            z_coordinates.append(point[3])  # Use distance (or another appropriate value) as z coordinate
             intensity.append(point[1])  # Use distance (or another appropriate value) as intensity
 
-    if i % plot_interval == 0 and x_coordinates and y_coordinates:
+    if i % plot_interval == 0 and x_coordinates and y_coordinates and z_coordinates:
         plt.clf()
-        plt.scatter(x_coordinates, y_coordinates, c=intensity, cmap='viridis', marker='o', alpha=0.5)
-        plt.xlabel('X Coordinates')
-        plt.ylabel('Y Coordinates')
-        plt.title('RPLidar Data (Cartesian Plot)')
-        plt.colorbar(label='Intensity')
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        sc = ax.scatter(x_coordinates, y_coordinates, z_coordinates, c=intensity, cmap='viridis', marker='o', alpha=0.5)
+        ax.set_xlabel('X Coordinates')
+        ax.set_ylabel('Y Coordinates')
+        ax.set_zlabel('Z Coordinates')
+        plt.title('RPLidar Data (3D Cartesian Plot)')
+        plt.colorbar(sc, label='Intensity')
         plt.grid(True)
         plt.pause(0.1)
 
