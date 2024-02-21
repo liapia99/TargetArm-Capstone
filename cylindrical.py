@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D  # Import 3D plotting tools
 from rplidar import RPLidar, RPLidarException
 
 def get_data():
@@ -15,34 +14,38 @@ def get_data():
         print(f"Error: {e}")
         return []
 
-plot_interval = 1 
+plot_interval = 1  # Plot every iteration
 max_iterations = 10000000
 
+angle_min = np.radians(0)
+angle_max = np.radians(90)  # Restricting from 0 to 90 degrees
+
+max_depth = 5.0  # Depth is 5 feet
 
 for i in range(max_iterations):
     if i % plot_interval == 0:
-        angles = []  # Initialize as a Python list
-        distances = []  # Initialize as a Python list
+        x_coordinates = []  # Initialize as a Python list
+        y_coordinates = []  # Initialize as a Python list
+        intensity = []  # Initialize as a Python list
         print(i)
         current_data = get_data()
-      
         for point in current_data:
             # Filter points based on angle and depth range
             if angle_min <= np.radians(point[1]) <= angle_max and point[2] <= max_depth:
-                angles.append(np.radians(point[1]))  # Convert angle to radians
-                distances.append(point[2])
-                
+                x_coordinates.append(point[2] * np.cos(np.radians(point[1])))  # Convert polar to Cartesian x
+                y_coordinates.append(point[2] * np.sin(np.radians(point[1])))  # Convert polar to Cartesian y
+                intensity.append(point[1])  # Use distance (or another appropriate value) as intensity
 
-        if angles and distances:
+        if x_coordinates and y_coordinates:
             plt.clf()
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-            ax.scatter(angles, distances, cmap='greens', marker='o', alpha=0.5)
-            ax.set_xlabel('Theta')
-            ax.set_ylabel('Distance')
-            plt.title('RPLidar Data (Cylindrical Plot)')
-            plt.show(block=False)
+            plt.scatter(x_coordinates, y_coordinates, c=intensity, cmap='viridis', marker='o', alpha=0.5)
+            plt.xlabel('X Coordinates')
+            plt.ylabel('Y Coordinates')
+            plt.title('RPLidar Data (Cartesian Plot)')
+            plt.colorbar(label='Intensity')
+            plt.grid(True)
             plt.pause(0.1)
 
+plt.show(block=False)
 plt.pause(10)  # Adjust as needed to keep the plot visible for some time
 plt.close()
