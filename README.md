@@ -1,3 +1,6 @@
+![Figure_1-7](https://github.com/liapia99/TargetArm-Capstone/assets/98356859/d45b629b-3f5a-458c-9533-da5c71e8b73c)
+![Figure_1-8](https://github.com/liapia99/TargetArm-Capstone/assets/98356859/eb7e2afb-db36-4177-bd14-5030cf3066d2)
+![Figure_1-9](https://github.com/liapia99/TargetArm-Capstone/assets/98356859/f5313bd0-5540-4b35-8c1d-cd6c754f0045)
 # TargetArm-Capstone
 
 ## Getting Started
