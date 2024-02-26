@@ -56,4 +56,8 @@ Looking more into ROS ecosystems and how to communicate with the RPLiDar, we det
   
   ```export LUA_INCLUDE_DIR=/usr/include/lua5.2```
   
-- To connect to the RPLiDar from the Jetson Nano, I followed this tutorial: https://www.hackster.io/shahizat/getting-started-with-the-low-cost-rplidar-using-jetson-nano-93521d
+- To connect to the RPLiDar from the Jetson Nano, I followed this tutorial: https://www.hackster.io/shahizat/getting-started-with-the-low-cost-rplidar-using-jetson-nano-93521d![Screenshot from 2024-02-26 15-20-00](https://github.com/liapia99/TargetArm-Capstone/assets/98356859/b8b12650-c30c-4cb7-8f59-35884930dadc)
+
+
+
+  
