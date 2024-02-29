@@ -24,7 +24,7 @@ def get_data():
         return []
 
 max_iterations = 20  # or any desired value
-plot_interval = 1  # set to 30 for saving every 30 iterations
+plot_interval = 1 
 
 # Lists to store data for each 30 iterations
 all_angles = []
