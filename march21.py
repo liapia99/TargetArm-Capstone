@@ -28,16 +28,18 @@ class LiDARScanner:
     def plot_lidar_data(self, scan_data, phi):
         angles = np.array([np.radians(measurement[1]) for measurement in scan_data])
         distances = np.array([measurement[2] for measurement in scan_data])
+        phi = np.array([measurement[3] for measurement in phi])
 
         x = distances * np.cos(angles) * np.cos(phi)
         y = distances * np.sin(angles)
         z = distances * np.cos(angles) * np.sin(phi)
 
-    def check_distance(self, scan_data, phi):
+    def check_distance(self, scan_data):
         with open('lidar_results.txt', 'w') as file:
             for measurement in scan_data and phi:
                 angle = measurement[1]
                 distance = measurement[2] / 304.8  # millimeters to feet
+                phi = measurement[3]
 
 
                 if distance < 5:
