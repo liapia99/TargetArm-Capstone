@@ -1,9 +1,6 @@
 import numpy as np
 from rplidar import RPLidar, RPLidarException
 
-class LiDARScanner:
-    def __init__(self, port='/dev/ttyUSB0'):
-        self.port = port
 
     def get_data():
         try:
