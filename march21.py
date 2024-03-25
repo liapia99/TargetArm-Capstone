@@ -6,17 +6,16 @@ class LiDARScanner:
         self.port = port
 
     def get_data():
-    try:
-        lidar = RPLidar('/dev/ttyUSB0')
-        for scan in lidar.iter_scans(max_buf_meas=500):
-            break
-        lidar.stop()
-        lidar.disconnect()
-        return scan
-    except RPLidarException as e:
-        print(f"Error: {e}")
-        return []
-
+        try:
+            lidar = RPLidar('/dev/ttyUSB0')
+            for scan in lidar.iter_scans(max_buf_meas=500):
+                break
+            lidar.stop()
+            lidar.disconnect()
+            return scan
+        except RPLidarException as e:
+            print(f"Error: {e}")
+            return []
    # def calculate_phi(self, seconds=2):
         # Calculate phi for every 2 seconds (30 degrees)
     #    degrees_per_second = 30 / seconds
