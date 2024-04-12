@@ -33,9 +33,8 @@ def check_distance(scan_data):
         for measurement in scan_data:
             angle = measurement[1]
             distance = measurement[2] / 25.4  # Convert distance from millimeters to inches
-            if distance < 12:
-                file.write(f"Object detected at {distance:.2f} inches.\n")
-                print(f"{distance:.2f} ")
+            file.write(f"Object detected at {distance:.2f} inches.\n")
+            print(f"{distance:.2f} ")
 
 if __name__ == "__main__":
     lidar_data = get_data()
