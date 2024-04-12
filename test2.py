@@ -1,6 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from rplidar import RPLidar, RPLidarException
+import serial
+
+arduino_port = "/dev/ttyACM0"  # Change this to your Arduino port - Linux: /ttyACM0 and Mac - /cu.usbmodem2101
+arduino_baudrate = 9600
+ser = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 
 def get_data():
     try:
@@ -23,13 +27,6 @@ def plot_lidar_data(scan_data):
     y = distances * np.sin(angles)
 
     
-    plt.figure(figsize=(10, 10))
-    plt.scatter(x, y, s=5, color='blue', alpha=0.5)
-    plt.title('X and Y Graph')
-    plt.xlabel('X (inches)')
-    plt.ylabel('Y (inches)')
-    plt.grid(True)
-    plt.show()
 
 def check_distance(scan_data):
     with open('lidar_results.txt', 'w') as file:
@@ -38,7 +35,7 @@ def check_distance(scan_data):
             distance = measurement[2] / 25.4  # Convert distance from millimeters to inches
             if distance < 12:
                 file.write(f"Object detected at {distance:.2f} inches.\n")
-                print(f"Object detected at {distance:.2f} inches.")
+                print(f"{distance:.2f} ")
 
 if __name__ == "__main__":
     lidar_data = get_data()
@@ -46,3 +43,8 @@ if __name__ == "__main__":
     if lidar_data:
         plot_lidar_data(lidar_data)
         check_distance(lidar_data)
+    ser.close()
+    try:
+        ser.close()
+    except serial.serialutil.SerialException as e:
+        print(f"Error closing serial port: {e}")
