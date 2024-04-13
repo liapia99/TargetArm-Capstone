@@ -29,13 +29,18 @@ def plot_lidar_data(scan_data):
     
 
 def check_distance(scan_data):
+    total_distance = 0.0
+    count = 0
     for i, measurement in enumerate(scan_data):
         if i >= 5:  # Break the loop after 5 measurements
             break
         distance = measurement[2] / 25.4  # Convert distance from millimeters to inches
-        print(f"{distance:.2f}")  # Print the distance
-        ser.write(f"{distance:.2f}\n".encode())  # Send the distance over serial
+        total_distance += distance  # Accumulate the distance values
+        count += 1  # Increment the count
 
+    average_distance = total_distance / count  # Calculate the average distance
+    print(f"Average Distance: {average_distance:.2f}")  # Print the average distance
+    ser.write(f"{average_distance:.2f}\n".encode())  # Send the average distance over serial
 
 if __name__ == "__main__":
     lidar_data = get_data()
