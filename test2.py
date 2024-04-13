@@ -29,10 +29,13 @@ def plot_lidar_data(scan_data):
     
 
 def check_distance(scan_data):
-    for measurement in scan_data:
+    for i, measurement in enumerate(scan_data):
+        if i >= 5:  # Break the loop after 5 measurements
+            break
         distance = measurement[2] / 25.4  # Convert distance from millimeters to inches
         print(f"{distance:.2f}")  # Print the distance
         ser.write(f"{distance:.2f}\n".encode())  # Send the distance over serial
+
 
 if __name__ == "__main__":
     lidar_data = get_data()
