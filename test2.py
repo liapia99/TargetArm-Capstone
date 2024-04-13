@@ -31,10 +31,11 @@ def plot_lidar_data(scan_data):
 def check_distance(scan_data):
     if scan_data:  # Check if scan_data is not empty
         distance = scan_data[0][2] / 25.4  # Convert distance from millimeters to inches for the first measurement
-        print(f"Distance: {distance:.2f}")  # Print the distance
+        print(f"Sending Distance: {distance:.2f}")  # Debug print
         ser.write(f"{distance:.2f}\n".encode())  # Send the distance over serial
     else:
         print("No Lidar data available.")
+
         
 if __name__ == "__main__":
     lidar_data = get_data()
