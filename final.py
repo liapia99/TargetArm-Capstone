@@ -48,7 +48,7 @@ def check_distance(scan_data):
     if scan_data: 
         distance = scan_data[0][2] / 25.4  # Convert distance from millimeters to inches
         print(f"Sending Distance: {distance:.2f} + Z_angle: {shortest_distance_time:.2f}")  # Debug print
-        ser.write(f"{distance:.2f}{shortest_distance_time:.2f}z".encode())  # Send the distance over serial
+        ser.write(f"{distance:.2f},{shortest_distance_time:.2f} + '\n".encode())  # Send the distance over serial
     else:
         print("No Lidar data available.")
 
