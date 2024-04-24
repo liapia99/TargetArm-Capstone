@@ -4,34 +4,35 @@ import serial
 import time
 
 arduino_port = "/dev/ttyACM0"
-arduino_baudrate = 9600
+arduino_baudrate = 115200
 ser = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 
 def get_data():
     try:
         lidar = RPLidar('/dev/ttyUSB0')
-        start_time = time.time()  # Start the timer
         shortest_distance = float('inf')  # Initialize shortest_distance to infinity
         shortest_distance_time = 0  # Initialize shortest_distance_time
 
-        for scan in lidar.iter_scans(max_buf_meas=500):
-            current_time = time.time() - start_time  # Calculate current time
-            if current_time >= 120:  # Check if 120 seconds have passed
-                break
+        for scan in lidar.iter_scans(max_buf_meas=200):
+            start_time = time.time()  # Start the timer
+            for measurement in scan:
+                current_time = time.time() - start_time  # Calculate current time
+                if current_time >= 60:  # Check if 120 seconds have passed
+                    break
+                
+                distances = [measurement[2] for measurement in scan]
+                min_distance = min(distances) / 25.4  
+                if min_distance < shortest_distance:
+                    shortest_distance = min_distance
+                    shortest_distance_time = current_time
             
-            distances = [measurement[2] for measurement in scan]
-            min_distance = min(distances) / 25.4  
-            if min_distance < shortest_distance:
-                shortest_distance = min_distance
-                shortest_distance_time = current_time
-
-        lidar.stop()
-        lidar.disconnect()
-        
-        print(f"Shortest Distance: {shortest_distance:.2f} inches")
-        print(f"Time when shortest distance was achieved: {shortest_distance_time:.2f} seconds")
-        
-        return scan, shortest_distance_time  # Return scan and shortest_distance_time
+            lidar.stop()
+            lidar.disconnect()
+            
+            print(f"Shortest Distance: {shortest_distance:.2f} inches")
+            print(f"Time when shortest distance was achieved: {shortest_distance_time:.2f} seconds")
+            
+            return scan, shortest_distance_time  # Return scan and shortest_distance_time
     except RPLidarException as e:
         print(f"Error: {e}")
         return [], 0
@@ -53,12 +54,15 @@ def check_distance(scan_data, shortest_distance_time):
         print("No Lidar data available.")
 
 if __name__ == "__main__":
-    lidar_data, shortest_distance_time = get_data()  # Get scan and shortest_distance_time
+    while True:  # Run indefinitely
+        lidar_data, shortest_distance_time = get_data()  # Get scan and shortest_distance_time
 
-    if lidar_data:
-        plot_lidar_data(lidar_data)
-        check_distance(lidar_data, shortest_distance_time)  # Pass shortest_distance_time
-    
+        if lidar_data:
+            plot_lidar_data(lidar_data)
+            check_distance(lidar_data, shortest_distance_time)  # Pass shortest_distance_time
+        
+        time.sleep(60)  # Wait for 60 seconds before next iteration
+
     try:
         ser.close()
     except serial.serialutil.SerialException as e:
