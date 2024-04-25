@@ -10,14 +10,14 @@ ser = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 def get_data():
     try:
         lidar = RPLidar('/dev/ttyUSB0')
-        ser.write("Time Start\n".encode()) #Letting Arduino know that timer started
+        ser.write("Time Start\n".encode()) # Letting Arduino know that timer started
         start_time = time.time()  # Start the timer
         shortest_distance = float('inf')  # Initialize shortest_distance to infinity
         shortest_distance_time = 0  # Initialize shortest_distance_time
 
         for scan in lidar.iter_scans(max_buf_meas=200):
             current_time = time.time() - start_time  # Calculate current time
-            if current_time >= 60:  # Check if 120 seconds have passed
+            if current_time >= 60:  # Check if 60 seconds have passed
                 break
             
             distances = [measurement[2] for measurement in scan]
@@ -32,32 +32,22 @@ def get_data():
         print(f"Shortest Distance: {shortest_distance:.2f} inches")
         print(f"Time when shortest distance was achieved: {shortest_distance_time:.2f} seconds")
         
-        return scan, shortest_distance_time  # Return scan and shortest_distance_time
+        return shortest_distance, shortest_distance_time  # Return shortest_distance and shortest_distance_time
     except RPLidarException as e:
         print(f"Error: {e}")
-        return [], 0
-
-def plot_lidar_data(scan_data):
-    angles = np.array([np.radians(measurement[1]) for measurement in scan_data])
-    distances = np.array([measurement[2] for measurement in scan_data])
-
-    x = distances * np.cos(angles)
-    y = distances * np.sin(angles)
-  
+        return None, 0
 
 def check_distance(shortest_distance, shortest_distance_time):
     if shortest_distance is not None: 
-        print(f"Sending Distance: {shortest_distance:.2f} + Z_angle: {shortest_distance_time:.2f}")  # Debug print
-        ser.write(f"{shortest_distance},{shortest_distance_time}\n".encode())  # Send the distance and Z angle over serial
+        print(f"Sending Distance: {shortest_distance:.2f} inches, Time: {shortest_distance_time:.2f} seconds")  # Debug print
+        ser.write(f"{shortest_distance},{shortest_distance_time}\n".encode())  # Send the distance and time over serial
     else:
         print("No shortest distance available.")
 
 if __name__ == "__main__":
-    lidar_data, shortest_distance_time = get_data()  # Get scan and shortest_distance_time
+    shortest_distance, shortest_distance_time = get_data()  # Get shortest_distance and shortest_distance_time
 
-    if lidar_data:
-        shortest_distance = min([measurement[2] for measurement in lidar_data]) / 25.4  # Convert to inches
-        plot_lidar_data(lidar_data)
+    if shortest_distance is not None:
         check_distance(shortest_distance, shortest_distance_time)  # Pass shortest_distance and shortest_distance_time
     
     try:
