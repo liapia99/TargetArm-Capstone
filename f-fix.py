@@ -10,7 +10,8 @@ ser = serial.Serial(arduino_port, arduino_baudrate, timeout=1)
 def get_data():
     try:
         lidar = RPLidar('/dev/ttyUSB0')
-        ser.write("Time Start\n".encode()) # Letting Arduino know that timer started
+        ser.write("Time Start\n".encode()) 
+        print("Time Start")# Letting Arduino know that timer started
         start_time = time.time()  # Start the timer
         shortest_distance = float('inf')  # Initialize shortest_distance to infinity
         shortest_distance_time = 0  # Initialize shortest_distance_time
