@@ -41,8 +41,9 @@ def get_data():
 
 def check_distance(shortest_distance, shortest_distance_time):
     if shortest_distance is not None: 
-        print(f"Sending Distance: {shortest_distance:.2f} inches, Time: {shortest_distance_time:.2f} seconds")
-        ser.write(f"{shortest_distance},{shortest_distance_time}\n".encode())
+        data_string = f"{shortest_distance:.2f},{shortest_distance_time:.2f}\n"
+        print(f"Sending Data: {data_string.strip()}")
+        ser.write(data_string.encode())
     else:
         print("No shortest distance available.")
 
