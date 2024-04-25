@@ -45,20 +45,20 @@ def plot_lidar_data(scan_data):
     y = distances * np.sin(angles)
   
 
-def check_distance(scan_data, shortest_distance_time):
-    if scan_data: 
-        distance = scan_data[0][2] / 25.4  # Convert distance from millimeters to inches
-        print(f"Sending Distance: {distance:.2f} + Z_angle: {shortest_distance_time:.2f}")  # Debug print
-        ser.write(f"{distance},{shortest_distance_time}\n".encode())  # Send the distance and Z angle over serial
+def check_distance(shortest_distance, shortest_distance_time):
+    if shortest_distance is not None: 
+        print(f"Sending Distance: {shortest_distance:.2f} + Z_angle: {shortest_distance_time:.2f}")  # Debug print
+        ser.write(f"{shortest_distance},{shortest_distance_time}\n".encode())  # Send the distance and Z angle over serial
     else:
-        print("No Lidar data available.")
+        print("No shortest distance available.")
 
 if __name__ == "__main__":
     lidar_data, shortest_distance_time = get_data()  # Get scan and shortest_distance_time
 
     if lidar_data:
+        shortest_distance = min([measurement[2] for measurement in lidar_data]) / 25.4  # Convert to inches
         plot_lidar_data(lidar_data)
-        check_distance(lidar_data, shortest_distance_time)  # Pass shortest_distance_time
+        check_distance(shortest_distance, shortest_distance_time)  # Pass shortest_distance and shortest_distance_time
     
     try:
         ser.close()
