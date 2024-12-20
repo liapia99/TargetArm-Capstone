@@ -1,53 +1,59 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2
-from velodyne_msgs.msg import VelodynePacket
-from sensor_msgs import point_cloud2
-import std_msgs.msg
-import math
+import sensor_msgs_py.point_cloud2 as pc2
+import open3d as o3d
+import numpy as np
 
 class VelodynePointCloudSubscriber(Node):
     def __init__(self):
         super().__init__('velodyne_pointcloud_subscriber')
 
-        # Subscriber for Velodyne UDP packets
-        self.create_subscription(VelodynePacket, '/velodyne_packets', self.velodyne_callback, 10)
+        # Subscribe to the Velodyne PointCloud2 topic
+        self.subscription = self.create_subscription(
+            PointCloud2,
+            '/velodyne_points',  # Topic name
+            self.listener_callback,
+            10
+        )
 
-        # Subscriber for the PointCloud2 data
-        self.create_subscription(PointCloud2, '/velodyne_points', self.point_cloud_callback, 10)
+    def listener_callback(self, msg):
+        # Convert PointCloud2 message to a numpy array
+        pc_data = pc2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True)
+        points = np.array(list(pc_data))
 
-    def velodyne_callback(self, msg):
-        # This callback will process the Velodyne UDP packet data.
-        # Typically, we use the driver to convert packets to PointCloud2, 
-        # but here we directly show how you can access packet info.
-        self.get_logger().info('Received a Velodyne packet')
+        # Perform object detection or any processing you need here
+        self.detect_objects(points)
 
-        # Process the packet and convert to PointCloud2 here (you would typically use velodyne_driver)
-        # For now, this is just a placeholder.
-        pass
+    def detect_objects(self, points):
+        # Create an Open3D point cloud object
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(points)
 
-    def point_cloud_callback(self, msg):
-        # Callback to process PointCloud2 data.
-        # Extract points from the PointCloud2 message
-        gen = point_cloud2.read_points(msg, field_names=("x", "y", "z"), skip_nans=True)
-        points = list(gen)
-        
-        # Print out the distances of objects detected
-        for point in points:
-            x, y, z = point[0], point[1], point[2]
-            distance = math.sqrt(x**2 + y**2 + z**2)
-            self.get_logger().info(f'Detected object at distance: {distance} meters')
+        # Visualize the point cloud (optional, for debugging)
+        o3d.visualization.draw_geometries([pcd])
+
+        # Apply a simple clustering algorithm to detect objects (e.g., DBSCAN)
+        labels = self.dbscan_clustering(pcd)
+
+        # Visualize clusters (optional)
+        self.visualize_clusters(pcd, labels)
+
+    def dbscan_clustering(self, pcd):
+        # Apply DBSCAN for clustering
+        pcd_tree = o3d.geometry.KDTreeFlann(pcd)
+        labels = np.array(pcd.cluster_dbscan(eps=0.3, min_points=10, print_progress=True))
+        return labels
+
+    def visualize_clusters(self, pcd, labels):
+        colors = plt.get_cmap("tab20")(labels / max(labels))  # Use different colors for each cluster
+        pcd.colors = o3d.utility.Vector3dVector(colors[:, :3])  # RGB values
+        o3d.visualization.draw_geometries([pcd])
 
 def main(args=None):
     rclpy.init(args=args)
-
-    # Create the node and start receiving messages
     node = VelodynePointCloudSubscriber()
-
-    # Spin the node to keep it alive and handle incoming messages
     rclpy.spin(node)
-
-    # Clean up and shut down the node
     node.destroy_node()
     rclpy.shutdown()
 
