@@ -1,0 +1,78 @@
+veloReader = velodyneFileReader('Velodata3.pcap', 'VLP16');
+
+xlimits = [-5 5];
+ylimits = [-5 5];
+zlimits = [-2 2];
+
+player = pcplayer(xlimits,ylimits,zlimits);
+
+xlabel(player.Axes, 'X (m)');
+ylabel(player.Axes, 'Y (m)');
+zlabel(player.Axes, 'Z (m)');
+
+reference_point = [0, 0, 0];
+
+veloReader.CurrentTime = veloReader.StartTime + seconds(0.3);
+
+while(hasFrame(veloReader) && player.isOpen() && (veloReader.CurrentTime < veloReader.StartTime + seconds(20)))
+   ptCloudObj = readFrame(veloReader);
+  
+   % extract point locations (matrix: X, Y, Z)
+   points = ptCloudObj.Location;
+  
+   % define the cubic region of interest (ROI)
+   % [X_min X_max Y_min Y_max Z_min Z_max]
+   roi = [-0.95 0.95 -1 0 -2 2];  
+
+   % get indices of points inside the ROI
+   indices = findPointsInROI(ptCloudObj, roi);
+  
+   % select only the points inside the ROI
+   ptCloudB = select(ptCloudObj, indices);
+  
+   % calculate the radial distance (XY plane) of each point inside the ROI
+   filtered_points = ptCloudB.Location;  
+
+   % reverse the colormap (jet -> red to blue)
+   cmap = flipud(jet(256));  % Reversing the colormap
+  
+   % default color for points outside the ROI (gray)
+   outside_points = points(~indices, :); 
+  
+   % if points inside the ROI apply color mapping
+   if ~isempty(filtered_points)
+       distances = sqrt(filtered_points(:,1).^2 + filtered_points(:,2).^2); 
+      
+       % compute the maximum distance (radius) from the reference point
+       max_radius = max(distances);
+       disp(['Distance from LiDAR: ', num2str(round(max_radius, 5)), ' meters']);
+
+       % normalize distances for coloring (0 to 1)
+       normalized_distances = (distances - min(distances)) / max((max(distances) - min(distances)), eps);
+
+       % map normalized distances to colormap indices
+       colorIndices = round(normalized_distances * 255) + 1;
+       colors = cmap(colorIndices, :);  % Get corresponding colors
+      
+       % create a colored point cloud for points inside the ROI
+       filteredPointCloud = pointCloud(filtered_points, 'Color', uint8(colors * 255));
+      
+       % display the filtered point cloud inside the ROI
+       view(player, filteredPointCloud);
+   else
+       disp('No points found in ROI.');
+   end
+  
+   % display points outside the ROI in gray
+   if ~isempty(outside_points)
+       outsidePointCloud = pointCloud(outside_points, 'Color', uint8(repmat([0.5, 0.5, 0.5], size(outside_points, 1), 1) * 255));
+       view(player, outsidePointCloud);
+   end
+  
+   % plot the lidar point (red dot) in the center
+   hold(player.Axes, 'on');
+   plot3(player.Axes, reference_point(1), reference_point(2), reference_point(3), 'ro', 'MarkerFaceColor', 'r', 'MarkerSize', 10);
+   hold(player.Axes, 'off');
+  
+   pause(0.1);
+end
