@@ -1,0 +1,85 @@
+% TargetArm LiDAR Capstone 2025
+
+%location of gathered pcap files using tcpdump
+pcapDir = '/Users/julkapiascik/Documents/lidar_pcaps';
+processedFiles = {};
+
+% setting graph boundaries
+xlimits = [-5 5];
+ylimits = [-5 5];
+zlimits = [-2 2];
+player = pcplayer(xlimits, ylimits, zlimits);
+xlabel(player.Axes, 'X (m)');
+ylabel(player.Axes, 'Y (m)');
+zlabel(player.Axes, 'Z (m)');
+
+% defining where the LiDAR is
+reference_point = [0, 0, 0];
+
+% sending data to LCD and LEDs through Arduino Uno
+arduinoPort = serialport("/dev/tty.usbmodem8301", 9600);
+pause(2); 
+
+while player.isOpen()
+    files = dir(fullfile(pcapDir, 'lidar_*.pcap'));
+    [~, idx] = sort([files.datenum]);
+    for i = 1:length(idx)
+        f = files(idx(i)).name;
+        if ismember(f, processedFiles)
+            continue;
+        end
+        fullpath = fullfile(pcapDir, f);
+        try
+            veloReader = velodyneFileReader(fullpath, 'VLP16');
+            disp(['Processing ', fullpath]);
+            veloReader.CurrentTime = veloReader.StartTime + seconds(0.3);
+            
+% once data is received properly, it will start processing the data
+            while hasFrame(veloReader) && player.isOpen()
+                ptCloudObj = readFrame(veloReader);
+                points = ptCloudObj.Location;
+                roi = [-2 2 -2 2 -2 2]; %setting up the threshold for ROI
+                indices = findPointsInROI(ptCloudObj, roi);
+                ptCloudB = select(ptCloudObj, indices);
+                filtered_points = ptCloudB.Location;
+                cmap = flipud(jet(256)); %flipping colormap
+                outside_points = points(~indices, :);
+
+                if ~isempty(filtered_points)
+                    distances = sqrt(filtered_points(:, 1).^2 + filtered_points(:, 2).^2);
+                    min_radius = min(distances);
+%sending shortest distance to LiDAR
+
+                    distanceStr = num2str(round(min_radius, 2));  % already in meters
+                    disp(['Closest distance: ', distanceStr, ' m']);
+                    writeline(arduinoPort, distanceStr);
+
+                    normalized_distances = (distances - min(distances)) / max((max(distances) - min(distances)), eps);
+                    colorIndices = round(normalized_distances * 255) + 1;
+                    colors = cmap(colorIndices, :);
+                    filteredPointCloud = pointCloud(filtered_points, 'Color', uint8(colors * 255));
+                    view(player, filteredPointCloud);
+                else
+                    disp('No points found in ROI.');
+                end
+% was supposed to make points outside the ROI gray but didn't end up working :( 
+                if ~isempty(outside_points)
+                    outsidePointCloud = pointCloud(outside_points, 'Color', uint8(repmat([0.5, 0.5, 0.5], size(outside_points, 1), 1) * 255));
+                    view(player, outsidePointCloud);
+                end
+
+                hold(player.Axes, 'on');
+                plot3(player.Axes, reference_point(1), reference_point(2), reference_point(3), 'ro', 'MarkerFaceColor', 'r', 'MarkerSize', 10);
+                hold(player.Axes, 'off');
+
+                pause(0.5);
+            end
+
+            processedFiles{end+1} = f;
+        catch ME
+            disp(['Error with ', f, ': ', ME.message]);
+        end
+    end
+    pause(0.5);
+end
+
